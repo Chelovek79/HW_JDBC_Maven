@@ -1,29 +1,33 @@
+import service.EmployeeDAO;
+import service.EmployeeDAOImpl;
+import tableClass.City;
+import tableClass.Employee;
+
 import java.sql.*;
 
 public class Application {
 
-    public static void main(String[] args) throws SQLException{
+    public static void main(String[] args) throws SQLException {
 
-        final String user = "postgres";
-        final String password = "clover";
-        final String url = "jdbc:postgresql://localhost:5432/skypro";
+        EmployeeDAO employeeDAO = new EmployeeDAOImpl();
 
-        try (final Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement statement = connection.prepareStatement("SELECT *" +
-                     "FROM employee\n" +
-                     "LEFT JOIN city c ON c.city_id = employee.city_id\n" +
-                     "WHERE id = 4;")) {
-            ResultSet resultSet = statement.executeQuery();
-            while (resultSet.next()){
+// Создание (добавление) сущности Employee в таблицу.
+        employeeDAO.addToTableEmployee(new Employee(1, "Екатерина", "Свиридова", "жен.", 33,
+                new City(1, null)));
 
-                System.out.println(resultSet.getString("last_name") + " "
-                + resultSet.getString("gender") + " "
-                + resultSet.getString("city_name"));
-            }
+// Получение конкретного объекта Employee по id.
+        System.out.println(employeeDAO.getOneEmployee(6));
 
-        }catch (SQLException e) {
-            System.out.println("Ошибка при подключении к БД !!!");
-            e.printStackTrace();
-        }
+// Получение списка всех объектов Employee из базы.
+        employeeDAO.getAllEmployee().stream()
+                .forEachOrdered(System.out::println);
+
+// Изменение конкретного объекта Employee в базе по id.
+        employeeDAO.updateMemberEmmployee(new Employee(7,"Екатерина","Матвеева","жен.",18,
+                new City(3, null)));
+
+// Удаление конкретного объекта Employee из базы по id.
+        employeeDAO.delOneMemberEmployee(7);
+
     }
 }
